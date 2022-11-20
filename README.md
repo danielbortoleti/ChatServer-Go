@@ -4,7 +4,7 @@
 
 <p align="left"> 
  Realizado por: Daniel Melo, Christopher Ferreira, João Vitor Peres Araujo, Matheus Zanivan.<br>
- O chatserver é capaz de suportar conexões de múltiplos usuários, permite que o usuário faça comandos. Além disto, tem um bot que se comporta como um usuário, mas têm respostas automáticas.
+ <br> O chatserver é capaz de suportar conexões de múltiplos usuários, permite que o usuário faça comandos. Além disto, tem um bot que se comporta como um usuário, mas têm respostas automáticas.
 </p>
  
 <p align="left">
