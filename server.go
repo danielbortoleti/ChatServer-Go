@@ -11,15 +11,16 @@ import (
 type client chan<- string // canal de mensagem
 
 var (
-	entering   = make(chan client)
-	leaving    = make(chan client)
-	messages   = make(chan string)
-	newChannel = make(chan string)
-	pv         = make(chan string)
+	entering = make(chan client)
+	leaving  = make(chan client)
+	messages = make(chan string)
+	users    = make(map[string]client)
+	pv_msg   = make(chan string)
 )
 
 func broadcaster() {
 	clients := make(map[client]bool) // todos os clientes conectados
+
 	for {
 		select {
 		case msg := <-messages:
@@ -27,20 +28,18 @@ func broadcaster() {
 			for cli := range clients {
 				cli <- msg
 			}
+			fmt.Println(clients)
+
 		case cli := <-entering:
 			clients[cli] = true
 		case cli := <-leaving:
 			delete(clients, cli)
 			close(cli)
-
-			// case msg := <-pv:
-
-			// // comando meuNome NomeDoCara Msg
-			//   mensagem := strings.Split(msg, " ")
-			//   msgpv := mensagem[3]
-			//   de := mensagem[1]
-			//   para := mensagem[2]
-
+		case msg := <-pv_msg:
+			arg := strings.Split(msg, " ")
+			cliente := users[arg[2]]
+			fmt.Println(cliente)
+			cliente <- msg
 		}
 	}
 }
@@ -59,10 +58,10 @@ func handleConn(conn net.Conn) {
 	ch <- "vc é " + apelido
 	messages <- apelido + " chegou!"
 	entering <- ch
+	users[apelido] = ch
 
 	input := bufio.NewScanner(conn)
 	for input.Scan() {
-		messages <- apelido + ":" + input.Text()
 		entrada := strings.Split(input.Text(), " ")
 		comandos := entrada[0]
 
@@ -70,11 +69,18 @@ func handleConn(conn net.Conn) {
 		case ".nick":
 			messages <- "Username alterado para " + entrada[1]
 			apelido = entrada[1]
+			users[apelido] = ch
 
 		case ".sair":
 			leaving <- ch
 			messages <- apelido + " se foi "
 			conn.Close()
+
+		case ".pv":
+			pv_msg <- apelido + " -> " + entrada[1] + " " + entrada[2]
+
+		default:
+			messages <- apelido + ":" + input.Text()
 		}
 
 	}
@@ -82,17 +88,22 @@ func handleConn(conn net.Conn) {
 
 func main() {
 	fmt.Println("Iniciando servidor...")
+	// Gerando uma conexão TCP
 	listener, err := net.Listen("tcp", "localhost:3000")
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	go broadcaster()
 	for {
+		// Permite conexõoes com o servidor criado
 		conn, err := listener.Accept()
 		if err != nil {
 			log.Print(err)
 			continue
 		}
+		// Salva Conexão
+		// connections = append(connections, conn)
 		go handleConn(conn)
 	}
 }
