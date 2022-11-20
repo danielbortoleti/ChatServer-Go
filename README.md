@@ -9,14 +9,14 @@
  
 <p align="left">
   O usuário pode inserir comandos, além de apenas fazer o chat usando canais:
-  - Criar e mudar nick/apelido
-  - Sair
-  - Mensagem privada
+  <br>- Criar e mudar nick/apelido
+  <br>- Sair
+  <br>- Mensagem privada
 </p>
 
 <p align="left">
   Bot é um client que se conecta igual a um usuário. Porém, não têm entrada de texto, apenas recebem e respondem.
-  - Um bot que inverte o que foi escrito
+  <br> - Um bot que inverte o que foi escrito
 </p>
 
 </strong>
