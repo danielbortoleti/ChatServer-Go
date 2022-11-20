@@ -37,9 +37,21 @@ func broadcaster() {
 			close(cli)
 		case msg := <-pv_msg:
 			arg := strings.Split(msg, " ")
+			fmt.Println(arg)
+
 			cliente := users[arg[2]]
 			fmt.Println(cliente)
 			cliente <- msg
+
+			for c, _ := range clients {
+				fmt.Println(c)
+				if users[arg[2]] == c {
+					arg[3] = reverse(arg[3])
+					users[arg[2]] <- " retornou: " + arg[3]
+					break
+
+				}
+			}
 		}
 	}
 }
@@ -86,6 +98,17 @@ func handleConn(conn net.Conn) {
 	}
 }
 
+func reverse(s string) string {
+	rns := []rune(s) // convert to rune
+	for i, j := 0, len(rns)-1; i < j; i, j = i+1, j-1 {
+
+		rns[i], rns[j] = rns[j], rns[i]
+	}
+
+	// return the reversed string.
+	return string(rns)
+}
+
 func main() {
 	fmt.Println("Iniciando servidor...")
 	// Gerando uma conexão TCP
@@ -106,4 +129,5 @@ func main() {
 		// connections = append(connections, conn)
 		go handleConn(conn)
 	}
+
 }
